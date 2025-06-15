@@ -3,18 +3,18 @@ using Lean.Touch;
 
 public class VuforiaModelActivator : MonoBehaviour
 {
-    public GameObject customTrackerObject;   // The tracker prefab in the scene (custom plane indicator)
-    public GameObject objectToActivate;      // Your 3D model prefab in the scene (set inactive)
+    public GameObject customTrackerObject;   // Reference to the custom tracker in the scene
+    public GameObject objectToActivate;      // The 3D model to show
     private bool hasActivated = false;
 
     private void Start()
     {
         if (objectToActivate != null)
         {
-            objectToActivate.SetActive(false); // Ensure the 3D model is hidden at start
+            objectToActivate.SetActive(false); // Start hidden
         }
 
-        // Subscribe to LeanTouch's tap event
+        // Subscribe to LeanTouch tap event
         LeanTouch.OnFingerTap += HandleFingerTap;
     }
 
@@ -25,16 +25,17 @@ public class VuforiaModelActivator : MonoBehaviour
 
     private void HandleFingerTap(LeanFinger finger)
     {
+        // Exit if already activated or required references are missing
         if (hasActivated || objectToActivate == null || customTrackerObject == null)
             return;
 
-        // Raycast from the touch into the scene
+        // Cast a ray from the tap
         Ray ray = finger.GetRay();
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit))
         {
-            // Check if the user tapped the custom tracker object
+            // Activate only if the tapped object is the tracker
             if (hit.collider.gameObject == customTrackerObject)
             {
                 objectToActivate.transform.position = customTrackerObject.transform.position;
